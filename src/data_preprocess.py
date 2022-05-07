@@ -33,8 +33,8 @@ def training_data():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     X_train = preprocess_na(encode(X_train), method="zero").to_numpy()
     X_test = preprocess_na(encode(X_test), method="zero").to_numpy()
-    y_train = y_train.to_numpy()
-    y_test = y_test.to_numpy()
+    y_train = np.ravel(y_train.to_numpy().reshape(-1, 1))
+    y_test = np.ravel(y_test.to_numpy().reshape(-1,1))
     return X_train, X_test, y_train, y_test
 
 
