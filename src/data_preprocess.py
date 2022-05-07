@@ -12,6 +12,7 @@ def label_encode(df):
     :param df:
     :return: encode descriptive labels as numerical
     """
+    
     label_encoder = preprocessing.LabelEncoder()
     df['diet'] = label_encoder.fit_transform(df['diet'])
     for num in "1234":
@@ -34,6 +35,7 @@ def read_data(path, encode):
     :param path:
     :return:
     """
+    
     df = pd.read_csv(path)
     if encode == "label":
         df = label_encode(df)
@@ -56,6 +58,7 @@ def preprocess_na(df, method):
     :param method:
     :return:
     """
+    
     if method == "zero":
         df = df.fillna(0)
     if method == "mean":
@@ -71,27 +74,38 @@ def training_data(scale, encode, na):
     :param na: if "zero", fill na with 0; if "mean", fill na with column mean
     :return: training set and test set
     """
+    
     path = "../data/data.csv"
     X0, X1, y0, y1 = read_data(path, encode)
+    
+    # getting train/test split randomly from each class
     X_train0, X_test0, y_train0, y_test0 = train_test_split(X0, y0, test_size=0.2, random_state=42)
     X_train1, X_test1, y_train1, y_test1 = train_test_split(X1, y1, test_size=0.2, random_state=42)
+    
     X_train = pd.concat([X_train0, X_train1])
     y_train = pd.concat([y_train0, y_train1])
+    
     X_test = pd.concat([X_test0, X_test1])
     y_test = pd.concat([y_test0, y_test1])
+    
     X_train = preprocess_na(X_train, method=na)
     X_test = preprocess_na(X_test, method=na)
+    
     X_train = X_train.to_numpy()
     X_test = X_test.to_numpy()
+    
     y_train = np.ravel(y_train.to_numpy().reshape(-1, 1))
     y_test = np.ravel(y_test.to_numpy().reshape(-1,1))
+    
     ros = RandomOverSampler(random_state=0)
     X_train, y_train = ros.fit_resample(X_train, y_train)
+    
     if scale:
         scaler = preprocessing.StandardScaler().fit(X_train)
         X_train = scaler.transform(X_train)
         scaler = preprocessing.StandardScaler().fit(X_test)
         X_test = scaler.transform(X_test)
+        
     return X_train, X_test, y_train, y_test
 
 
@@ -103,15 +117,19 @@ def validation_data(scale, encode, na):
     :param na:
     :return:
     """
+    
     path = "../data/validation.csv"
     df = pd.read_csv(path)
     df.pop("unique_id")
+    
     if encode == "label":
         df = label_encode(df)
     if encode == "onehot":
         df = one_hot_encode(df)
+        
     df = preprocess_na(df, method=na)
     X = df.to_numpy()
+    
     if scale:
         scaler = preprocessing.StandardScaler().fit(X)
         X = scaler.transform(X)

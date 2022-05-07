@@ -35,4 +35,5 @@ def train_and_predict(model, encode, na):
 
     result = clf.predict_proba(validation_set)
     result = result[:, 1]
+    
     return train_score, test_score, result
